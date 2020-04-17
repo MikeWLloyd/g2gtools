@@ -262,6 +262,11 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
             # tags                  the tags in the AUX field
             # tlen                  insert size
 
+            # MWL NOTE: I am setting tlen from original alignment to tlen of new alignment. Macs2 seems to need this set to something other than 0. 
+            #           This may not be valid, given that positons of alignment will change.
+
+
+
             total += 1
 
             LOG.debug('~'*80)
@@ -392,7 +397,7 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
                     alignment_new.cigarstring = '0M'
                     alignment_new.rnext = name_to_id[read2_mappings[0].to_chr]
                     alignment_new.pnext = read2_mappings[0].to_start
-                    alignment_new.tlen = 0
+                    alignment_new.tlen = alignment.tlen
 
                     LOG.debug("\tPair Success (1:fail,2:simple): {0} {1}".format(alignment_new.pos, alignment_new.cigarstring))
                     new_file.write(alignment_new)
@@ -406,7 +411,7 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
                     alignment_new.cigarstring = '0M'
                     alignment_new.rnext = name_to_id[read2_mappings[0].to_chr]
                     alignment_new.pnext = read2_mappings[0].to_start
-                    alignment_new.tlen = 0
+                    alignment_new.tlen = alignment.tlen
 
                     LOG.debug("\tPair Success (1:fail,2:complex): {0} {1}".format(alignment_new.pos, alignment_new.cigarstring))
                     new_file.write(alignment_new)
@@ -422,7 +427,7 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
 
                     alignment_new.rnext = name_to_id[read1_mappings[0].to_chr]
                     alignment_new.pnext = 0
-                    alignment_new.tlen = 0    # CHECK
+                    alignment_new.tlen = alignment.tlen   # CHECK
 
                     LOG.debug("\tPair Success (1:simple,2:fail): {0} {1}".format(alignment_new.pos, alignment_new.cigarstring))
                     new_file.write(alignment_new)
@@ -436,7 +441,7 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
 
                     alignment_new.rnext = name_to_id[read2_mappings[0].to_chr]
                     alignment_new.pnext = read2_mappings[0].to_start
-                    alignment_new.tlen = 0    # CHECK
+                    alignment_new.tlen = alignment.tlen    # CHECK
 
                     LOG.debug("\tPair Success (1:simple,2:simple): {0} {1}".format(alignment_new.pos, alignment_new.cigarstring))
                     new_file.write(alignment_new)
@@ -450,7 +455,7 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
 
                     alignment_new.rnext = name_to_id[read2_mappings[0].to_chr]
                     alignment_new.pnext = read2_mappings[0].to_start
-                    alignment_new.tlen = 0    # CHECK
+                    alignment_new.tlen = alignment.tlen    # CHECK
 
                     LOG.debug("\tPair Success (1:simple,2:complex): {0} {1}".format(alignment_new.pos, alignment_new.cigarstring))
                     new_file.write(alignment_new)
@@ -466,7 +471,7 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
 
                     alignment_new.rnext = name_to_id[read1_mappings[0].to_chr]
                     alignment_new.pnext = 0
-                    alignment_new.tlen = 0    # CHECK
+                    alignment_new.tlen = alignment.tlen    # CHECK
 
                     LOG.debug("\tPair Success (1:complex,2:fail): {0} {1}".format(alignment_new.pos, alignment_new.cigarstring))
                     new_file.write(alignment_new)
@@ -480,7 +485,7 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
 
                     alignment_new.rnext = name_to_id[read2_mappings[0].to_chr]
                     alignment_new.pnext = read2_mappings[0].to_start
-                    alignment_new.tlen = 0    # CHECK
+                    alignment_new.tlen = alignment.tlen    # CHECK
 
                     LOG.debug("\tPair Success (1:complex,2:simple): {0} {1}".format(alignment_new.pos, alignment_new.cigarstring))
                     new_file.write(alignment_new)
@@ -494,7 +499,7 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
 
                     alignment_new.rnext = name_to_id[read2_mappings[0].to_chr]
                     alignment_new.pnext = read2_mappings[0].to_start
-                    alignment_new.tlen = 0    # CHECK
+                    alignment_new.tlen = alignment.tlen    # CHECK
 
                     LOG.debug("\tPair Success (1:complex,2:complex): {0} {1}".format(alignment_new.pos, alignment_new.cigarstring))
                     new_file.write(alignment_new)
