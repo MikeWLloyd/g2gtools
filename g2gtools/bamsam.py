@@ -1097,13 +1097,14 @@ def convert_cigar(cigar, chromosome, chain, sequence, strand='+', position=0):
         if c.code in [CIGAR_M, CIGAR_I, CIGAR_S, CIGAR_E, CIGAR_X]:
             cigar_seq_length += c.length
 
-    if cigar_seq_length != len(sequence):
-        LOG.debug("CIGAR SEQ LENGTH={0} != SEQ_LEN={1}".format(cigar_seq_length, len(sequence)))
-        # not equal according to chain file format, add the clipping length
-        simple_cigar.append((CIGAR_s, len(sequence) - cigar_seq_length))
-    elif ('*' in sequence):
+    try: 
+        if cigar_seq_length != len(sequence):
+            LOG.debug("CIGAR SEQ LENGTH={0} != SEQ_LEN={1}".format(cigar_seq_length, len(sequence)))
+            # not equal according to chain file format, add the clipping length
+            simple_cigar.append((CIGAR_s, len(sequence) - cigar_seq_length))
+    except:
         pass
-
+        
     if old_cigar != cigar_to_string(simple_cigar):
         LOG.debug("old cigar != new cigar")
     else:
