@@ -397,7 +397,7 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
                     alignment_new.cigarstring = '0M'
                     alignment_new.rnext = name_to_id[read2_mappings[0].to_chr]
                     alignment_new.pnext = read2_mappings[0].to_start
-                    alignment_new.tlen = alignment.tlen
+                    alignment_new.tlen = 0
 
                     LOG.debug("\tPair Success (1:fail,2:simple): {0} {1}".format(alignment_new.pos, alignment_new.cigarstring))
                     new_file.write(alignment_new)
@@ -411,7 +411,7 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
                     alignment_new.cigarstring = '0M'
                     alignment_new.rnext = name_to_id[read2_mappings[0].to_chr]
                     alignment_new.pnext = read2_mappings[0].to_start
-                    alignment_new.tlen = alignment.tlen
+                    alignment_new.tlen = 0
 
                     LOG.debug("\tPair Success (1:fail,2:complex): {0} {1}".format(alignment_new.pos, alignment_new.cigarstring))
                     new_file.write(alignment_new)
@@ -1024,93 +1024,95 @@ def convert_cigar(cigar, chromosome, chain, sequence, strand='+', position=0):
     :raises: :class:`.exceptions.G2GCigarFormatError` on invalid cigar string
     """
 
-    return cigar
+    # return cigar
 
-    # old_cigar = cigarlist_to_cigarstring(cigar)
-    # LOG.debug("CIGAR CONVERSION : {0}".format(old_cigar))
+    old_cigar = cigarlist_to_cigarstring(cigar)
+    LOG.debug("CIGAR CONVERSION : {0}".format(old_cigar))
 
-    # #
-    # # PHASE 1: Convert each CIGAR element to new mappings and construct an array on NEW cigar elements
-    # #
+    #
+    # PHASE 1: Convert each CIGAR element to new mappings and construct an array on NEW cigar elements
+    #
 
-    # LOG.debug("CIGAR CONVERSION : PHASE 1 : Converting cigar elements")
-    # new_cigar = _cigar_convert(cigar, chromosome, chain, strand, position)
-    # LOG.debug("AFTER PHASE 1 : {0} ".format(new_cigar))
+    LOG.debug("CIGAR CONVERSION : PHASE 1 : Converting cigar elements")
+    new_cigar = _cigar_convert(cigar, chromosome, chain, strand, position)
+    LOG.debug("AFTER PHASE 1 : {0} ".format(new_cigar))
 
-    # if len(new_cigar) == 1:
+    if len(new_cigar) == 1:
 
-    #     LOG.debug("CIGAR CONVERSION : Skipping to end since only 1 element")
+        LOG.debug("CIGAR CONVERSION : Skipping to end since only 1 element")
 
-    # else:
+    else:
 
-    #     #
-    #     # PHASE 2: Remove S if surrounded by M
-    #     #
+        #
+        # PHASE 2: Remove S if surrounded by M
+        #
 
-    #     LOG.debug("CIGAR CONVERSION : PHASE 2 : Remove S if surrounded by M")
-    #     new_cigar = _cigar_remove_softs_between_m(new_cigar)
-    #     LOG.debug("AFTER PHASE 2 : {0} ".format(new_cigar))
+        LOG.debug("CIGAR CONVERSION : PHASE 2 : Remove S if surrounded by M")
+        new_cigar = _cigar_remove_softs_between_m(new_cigar)
+        LOG.debug("AFTER PHASE 2 : {0} ".format(new_cigar))
 
-    #     #
-    #     # PHASE 3: Fix element lengths
-    #     #
+        #
+        # PHASE 3: Fix element lengths
+        #
 
-    #     LOG.debug("CIGAR CONVERSION : PHASE 3 : Fix element lengths")
-    #     new_cigar = _cigar_fix_lengths(new_cigar, sequence)
-    #     LOG.debug("AFTER PHASE 3 : {0} ".format(new_cigar))
+        LOG.debug("CIGAR CONVERSION : PHASE 3 : Fix element lengths")
+        new_cigar = _cigar_fix_lengths(new_cigar, sequence)
+        LOG.debug("AFTER PHASE 3 : {0} ".format(new_cigar))
 
-    #     #
-    #     # PHASE 4: Combine consecutive matching elements
-    #     #
+        #
+        # PHASE 4: Combine consecutive matching elements
+        #
 
-    #     LOG.debug("CIGAR CONVERSION : PHASE 4 : Combining elements")
-    #     new_cigar = _cigar_combine_consecutive(new_cigar)
-    #     LOG.debug("AFTER PHASE 4 : {0} ".format(new_cigar))
+        LOG.debug("CIGAR CONVERSION : PHASE 4 : Combining elements")
+        new_cigar = _cigar_combine_consecutive(new_cigar)
+        LOG.debug("AFTER PHASE 4 : {0} ".format(new_cigar))
 
-    #     #
-    #     # PHASE 5: Combine consecutive matching elements
-    #     #
+        #
+        # PHASE 5: Combine consecutive matching elements
+        #
 
-    #     LOG.debug("CIGAR CONVERSION : PHASE 5 : Fix pre and post Ms")
-    #     new_cigar = _cigar_fix_pre_and_post_M(new_cigar)
-    #     LOG.debug("AFTER PHASE 5 : {0} ".format(new_cigar))
+        LOG.debug("CIGAR CONVERSION : PHASE 5 : Fix pre and post Ms")
+        new_cigar = _cigar_fix_pre_and_post_M(new_cigar)
+        LOG.debug("AFTER PHASE 5 : {0} ".format(new_cigar))
 
-    # #
-    # # Final pass through CIGAR string
-    # #
-    # # test cigar string length
-    # #
-    # # SEQ: segment SEQuence. This field can be a '*' when the sequence is not stored. If not a '*',
-    # # the length of the sequence must equal the sum of lengths of M/I/S/=/X operations in CIGAR.
-    # # An '=' denotes the base is identical to the reference base. No assumptions can be made on the
-    # # letter cases.
-    # #
+    #
+    # Final pass through CIGAR string
+    #
+    # test cigar string length
+    #
+    # SEQ: segment SEQuence. This field can be a '*' when the sequence is not stored. If not a '*',
+    # the length of the sequence must equal the sum of lengths of M/I/S/=/X operations in CIGAR.
+    # An '=' denotes the base is identical to the reference base. No assumptions can be made on the
+    # letter cases.
+    #
 
-    # LOG.debug("CIGAR CONVERSION : PHASE 6 : Testing length and conversion")
+    LOG.debug("CIGAR CONVERSION : PHASE 6 : Testing length and conversion")
 
-    # cigar_seq_length = 0
+    cigar_seq_length = 0
 
-    # # simplify the cigar, throw away the other stuff we used
-    # simple_cigar = []
-    # for c in new_cigar:
-    #     simple_cigar.append((CIGAR_C2N[c.code], c.length))
-    #     if c.code in [CIGAR_M, CIGAR_I, CIGAR_S, CIGAR_E, CIGAR_X]:
-    #         cigar_seq_length += c.length
+    # simplify the cigar, throw away the other stuff we used
+    simple_cigar = []
+    for c in new_cigar:
+        simple_cigar.append((CIGAR_C2N[c.code], c.length))
+        if c.code in [CIGAR_M, CIGAR_I, CIGAR_S, CIGAR_E, CIGAR_X]:
+            cigar_seq_length += c.length
 
-    # if cigar_seq_length != len(sequence):
-    #     LOG.debug("CIGAR SEQ LENGTH={0} != SEQ_LEN={1}".format(cigar_seq_length, len(sequence)))
-    #     # not equal according to chain file format, add the clipping length
-    #     simple_cigar.append((CIGAR_s, len(sequence) - cigar_seq_length))
+    if cigar_seq_length != len(sequence):
+        LOG.debug("CIGAR SEQ LENGTH={0} != SEQ_LEN={1}".format(cigar_seq_length, len(sequence)))
+        # not equal according to chain file format, add the clipping length
+        simple_cigar.append((CIGAR_s, len(sequence) - cigar_seq_length))
+    elif ('*' in sequence):
+        pass
 
-    # if old_cigar != cigar_to_string(simple_cigar):
-    #     LOG.debug("old cigar != new cigar")
-    # else:
-    #     LOG.debug("old cigar == new cigar")
+    if old_cigar != cigar_to_string(simple_cigar):
+        LOG.debug("old cigar != new cigar")
+    else:
+        LOG.debug("old cigar == new cigar")
 
-    # LOG.debug("CIGAR CONVERSION : {0} ==> {1}".format(old_cigar, cigar_to_string(simple_cigar)))
+    LOG.debug("CIGAR CONVERSION : {0} ==> {1}".format(old_cigar, cigar_to_string(simple_cigar)))
 
-    # LOG.debug(simple_cigar)
-    # return simple_cigar
+    LOG.debug(simple_cigar)
+    return simple_cigar
 
 
 if __name__ == '__main__':
