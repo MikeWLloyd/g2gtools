@@ -261,7 +261,7 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
             # qual                  read sequence base qualities, including soft clipped bases
             # tags                  the tags in the AUX field
             # tlen                  insert size
-                # (read2_start + cigar bases) - read1_start = tlen
+                # (read2_start + cigar bases) - read1_start = tlen (positive for R1 and negative for R2)
    
 
             # MWL NOTE: I am setting tlen from original alignment to tlen of new alignment. Macs2 seems to need this set to something other than 0. 
@@ -358,6 +358,11 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
                 if alignment.mate_is_reverse:
                     alignment_new.flag |= FLAG_MREVERSE
 
+                if alignment.is_proper_pair:
+                    alignment_new.flag |= FLAG_PROPER_PAIR
+
+
+
                 read1_chr = sam_file.getrname(alignment.tid)
                 read1_start = alignment.pos
                 read1_end = alignment.aend
@@ -381,6 +386,9 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
                         read2_mappings = chain_file.find_mappings(read2_chr, read2_start, read2_end)
                     except:
                         read2_mappings = None
+
+                #res = sum(i[1] for i in alignment.cigar)
+                # cigar length
 
                 if read1_mappings is None and read2_mappings is None:
 
@@ -437,8 +445,6 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
 
                 elif read1_mappings and len(read1_mappings) == 1 and read2_mappings and len(read2_mappings) == 1:
 
-                    alignment_new.flag |= FLAG_PROPER_PAIR
-
                     alignment_new.tid = name_to_id[read1_mappings[0].to_chr]
                     alignment_new.pos = read1_mappings[0].to_start
                     alignment_new.cigar = alignment.cigar
@@ -452,8 +458,6 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
                     map_statistics_pair['success_1_simple_2_simple'] += 1
 
                 elif read1_mappings and len(read1_mappings) == 1 and read2_mappings and len(read2_mappings) > 1:
-
-                    alignment_new.flag |= FLAG_PROPER_PAIR
 
                     alignment_new.tid = name_to_id[read1_mappings[0].to_chr]
                     alignment_new.pos = read1_mappings[0].to_start
@@ -485,8 +489,6 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
 
                 elif read1_mappings and len(read1_mappings) > 1 and read2_mappings and len(read2_mappings) == 1:
 
-                    alignment_new.flag |= FLAG_PROPER_PAIR
-
                     alignment_new.tid = name_to_id[read1_mappings[0].to_chr]
                     alignment_new.pos = read1_mappings[0].to_start
                     alignment_new.cigar = convert_cigar(alignment.cigar, read_chr, chain_file, alignment.seq, read1_strand, alignment.pos)
@@ -501,8 +503,6 @@ def convert_bam_file(chain_file, file_in, file_out, reverse=False):
 
                 elif read1_mappings and len(read1_mappings) > 1 and read2_mappings and len(read2_mappings) > 1:
 
-                    alignment_new.flag |= FLAG_PROPER_PAIR
-                    
                     alignment_new.tid = name_to_id[read1_mappings[0].to_chr]
                     alignment_new.pos = read1_mappings[0].to_start
                     alignment_new.cigar = convert_cigar(alignment.cigar, read_chr, chain_file, alignment.seq, read1_strand, alignment.pos)
